@@ -133,6 +133,7 @@ window.onload = wrap_img;
 
   <div class="post-content e-content" itemprop="articleBody">
     <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#Import-modules">Import modules </a></li>
 <li class="toc-entry toc-h1"><a href="#Load-data">Load data </a></li>
 <li class="toc-entry toc-h1"><a href="#Save-images">Save images </a></li>
 <li class="toc-entry toc-h1"><a href="#Datablock">Datablock </a></li>
@@ -152,7 +153,7 @@ window.onload = wrap_img;
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>For some time now I've been wondering how much chemistry is necessary to train a model for QSAR. Do we need hand-crafted descriptors, such as ECFP and MACCS fingerprints? Or maybe complex quantum mechanical properties calculated with state-of-the-art software?</p>
-<p>In this notebook we'll use a different strategy. Instead of calculating explicit descriptors, we'll use simple images representing molecules to train a bioactivity classifier using fastai.</p>
+<p>On the last post, we used image-like input to train bioactivity classifier using fastai. But what if we tried with REAL images?</p>
 
 </div>
 </div>
@@ -162,6 +163,15 @@ window.onload = wrap_img;
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>First, we will import some libraries, including rdkit to deal with molecules.</p>
 
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Import-modules">
+<a class="anchor" href="#Import-modules" aria-hidden="true"><span class="octicon octicon-link"></span></a>Import modules<a class="anchor-link" href="#Import-modules"> </a>
+</h1>
 </div>
 </div>
 </div>
