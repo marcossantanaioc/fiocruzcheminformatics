@@ -49,6 +49,17 @@
   
 
   
+      ,"page1": {
+          "title": "About Me",
+          "content": "I’m computational chemist working as a postdoc researcher at Fundação Oswaldo Cruz (FIOCRUZ), Brazil. This is my blog to post about cheminformatics themes. .",
+          "url": "https://marcossantanaioc.github.io/fiocruzcheminformatics/about/",
+          "relUrl": "/about/",
+          "date": ""
+      }
+      
+  
+
+  
 
   
   
@@ -70,7 +81,7 @@
   
 
   
-      ,"page9": {
+      ,"page10": {
           "title": "",
           "content": "Sitemap: {{ “sitemap.xml” | absolute_url }} | .",
           "url": "https://marcossantanaioc.github.io/fiocruzcheminformatics/robots.txt",
