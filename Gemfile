@@ -8,7 +8,6 @@ source "https://rubygems.org"
 # This will help ensure the proper Jekyll version is running.
 # Happy Jekylling!
 gem "jekyll", "~> 4.1.0"
-bundle update rexml
 # This is the default theme for new Jekyll sites. You may change this to anything you like.
 gem "minima"
 # To upgrade, run `bundle update github-pages`.
