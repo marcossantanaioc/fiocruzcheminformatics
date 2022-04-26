@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="twitter:card" content="summary_large_image" /><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Clustering molecules | Cheminformatics at IOC</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Clustering molecules" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Primer on Exploratory data analysis." />
+<meta property="og:description" content="Primer on Exploratory data analysis." />
+<link rel="canonical" href="https://marcossantanaioc.github.io/fiocruzcheminformatics/jupyter/2022/04/27/clustering_dev.html" />
+<meta property="og:url" content="https://marcossantanaioc.github.io/fiocruzcheminformatics/jupyter/2022/04/27/clustering_dev.html" />
+<meta property="og:site_name" content="Cheminformatics at IOC" />
+<meta property="og:image" content="https://marcossantanaioc.github.io/fiocruzcheminformatics/images/1_rw8IUza1dbffBhiA4i0GNQ.png" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2022-04-27T00:00:00-05:00" />
+<script type="application/ld+json">
+{"headline":"Clustering molecules","dateModified":"2022-04-27T00:00:00-05:00","datePublished":"2022-04-27T00:00:00-05:00","url":"https://marcossantanaioc.github.io/fiocruzcheminformatics/jupyter/2022/04/27/clustering_dev.html","@type":"BlogPosting","image":"https://marcossantanaioc.github.io/fiocruzcheminformatics/images/1_rw8IUza1dbffBhiA4i0GNQ.png","mainEntityOfPage":{"@type":"WebPage","@id":"https://marcossantanaioc.github.io/fiocruzcheminformatics/jupyter/2022/04/27/clustering_dev.html"},"description":"Primer on Exploratory data analysis.","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/fiocruzcheminformatics/assets/css/style.css"><link type="application/atom+xml" rel="alternate" href="https://marcossantanaioc.github.io/fiocruzcheminformatics/feed.xml" title="Cheminformatics at IOC" /><link rel="shortcut icon" type="image/x-icon" href="/fiocruzcheminformatics/images/favicon.ico"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Primer/15.2.0/primer.css" integrity="sha512-xTz2ys4coGAOz8vuV1NcQBkgVmKhsSEtjbqyMJbBHRplFuvKIUo6xhLHpAyPt9mfR6twHJgn9OgVLuqOvjeBhg==" crossorigin="anonymous" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css" integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog==" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.css" integrity="sha512-h7nl+xz8wgDlNM4NqKEM4F1NkIRS17M9+uJwIGwuo8vGqIl4BhuCKdxjWEINm+xyrUjNCnK5dCrhM0sj+wTIXw==" crossorigin="anonymous" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/katex.min.js" integrity="sha512-/CMIhXiDA3m2c9kzRyd97MTb3MC6OVnx4TElQ7fkkoRghwDf6gi41gaT1PwF270W6+J60uTmwgeRpNpJdRV6sg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.12.0/contrib/auto-render.min.js" integrity="sha512-Do7uJAaHZm5OLrIv/yN4w0iG1dbu01kzdMNnFfu/mAqgUk6Nniv2JYHcwH+cNwjqgLcqcuBBk+JRvprLVI8azg==" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha512-0doc9hKxR3PYwso42RD1p5ySZpzzuDiOwMrdCEh2WdJZCjcmFKc/wEnL+z8fBQrnHoiNWbo+3fiGkOYXBdQp4A==" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement( document.body, {
+        delimiters: [
+            {left: "$$", right: "$$", display: true},
+            {left: "[%", right: "%]", display: true},
+            {left: "$", right: "$", display: false}
+        ]}
+        );
+    });
+    </script>
+
+
+<script>
+function wrap_img(fn) {
+    if (document.attachEvent ? document.readyState === "complete" : document.readyState !== "loading") {
+        var elements = document.querySelectorAll(".post img");
+        Array.prototype.forEach.call(elements, function(el, i) {
+            if (el.getAttribute("title") && (el.className != "emoji")) {
+                const caption = document.createElement('figcaption');
+                var node = document.createTextNode(el.getAttribute("title"));
+                caption.appendChild(node);
+                const wrapper = document.createElement('figure');
+                wrapper.className = 'image';
+                el.parentNode.insertBefore(wrapper, el);
+                el.parentNode.removeChild(el);
+                wrapper.appendChild(el);
+                wrapper.appendChild(caption);
+            }
+        });
+    } else { document.addEventListener('DOMContentLoaded', fn); }
+}
+window.onload = wrap_img;
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function(){
+    // add link icon to anchor tags
+    var elem = document.querySelectorAll(".anchor-link")
+    elem.forEach(e => (e.innerHTML = '<i class="fas fa-link fa-xs"></i>'));
+    });
+</script>
+</head>
+<body><header class="site-header">
+
+  <div class="wrapper"><a class="site-title" rel="author" href="/fiocruzcheminformatics/">Cheminformatics at IOC</a><nav class="site-nav">
+        <input type="checkbox" id="nav-trigger" class="nav-trigger" />
+        <label for="nav-trigger">
+          <span class="menu-icon">
+            <svg viewBox="0 0 18 15" width="18px" height="15px">
+              <path d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.032C17.335,0,18,0.665,18,1.484L18,1.484z M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.032C17.335,6.031,18,6.696,18,7.516L18,7.516z M18,13.516C18,14.335,17.335,15,16.516,15H1.484 C0.665,15,0,14.335,0,13.516l0,0c0-0.82,0.665-1.483,1.484-1.483h15.032C17.335,12.031,18,12.695,18,13.516L18,13.516z"/>
+            </svg>
+          </span>
+        </label>
+
+        <div class="trigger"><a class="page-link" href="/fiocruzcheminformatics/about/">About Me</a><a class="page-link" href="/fiocruzcheminformatics/search/">Search</a><a class="page-link" href="/fiocruzcheminformatics/categories/">Tags</a></div>
+      </nav></div>
+</header>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title p-name" itemprop="name headline">Clustering molecules</h1><p class="page-description">Primer on Exploratory data analysis.</p><p class="post-meta post-meta-title"><time class="dt-published" datetime="2022-04-27T00:00:00-05:00" itemprop="datePublished">
+        Apr 27, 2022
+      </time>
+       • <span class="read-time" title="Estimated read time">
+    
+    
+      1 min read
+    
+</span></p>
+
+    
+      <p class="category-tags"><i class="fas fa-tags category-tags-icon"></i></i> 
+      
+        <a class="category-tags-link" href="/fiocruzcheminformatics/categories/#jupyter">jupyter</a>
+        
+      
+      </p>
+    
+
+    
+      
+        <div class="pb-5 d-flex flex-wrap flex-justify-end">
+          <div class="px-2">
+
+    <a href="https://github.com/marcossantanaioc/fiocruzcheminformatics/tree/master/_notebooks/2022-04-27-clustering_dev.ipynb" role="button" target="_blank">
+<img class="notebook-badge-image" src="/fiocruzcheminformatics/assets/badges/github.svg" alt="View On GitHub">
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://mybinder.org/v2/gh/marcossantanaioc/fiocruzcheminformatics/master?filepath=_notebooks%2F2022-04-27-clustering_dev.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/fiocruzcheminformatics/assets/badges/binder.svg" alt="Open In Binder"/>
+    </a>
+</div>
+
+          <div class="px-2">
+    <a href="https://colab.research.google.com/github/marcossantanaioc/fiocruzcheminformatics/blob/master/_notebooks/2022-04-27-clustering_dev.ipynb" target="_blank">
+        <img class="notebook-badge-image" src="/fiocruzcheminformatics/assets/badges/colab.svg" alt="Open In Colab"/>
+    </a>
+</div>
+        </div>
+      </header>
+
+  <div class="post-content e-content" itemprop="articleBody">
+    <ul class="section-nav">
+<li class="toc-entry toc-h1"><a href="#Requirements">Requirements </a></li>
+<li class="toc-entry toc-h1"><a href="#Import-modules">Import modules </a></li>
+<li class="toc-entry toc-h1"><a href="#Load-Data">Load Data </a></li>
+<li class="toc-entry toc-h1"><a href="#References">References </a></li>
+<li class="toc-entry toc-h1"><a href="#Fin">Fin </a></li>
+</ul><!--
+#################################################
+### THIS FILE WAS AUTOGENERATED! DO NOT EDIT! ###
+#################################################
+# file to edit: _notebooks/2022-04-27-clustering_dev.ipynb
+-->
+
+<div class="container" id="notebook-container">
+        
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Exploratory data analysis is fundamental in cheminformatics.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Requirements">
+<a class="anchor" href="#Requirements" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements<a class="anchor-link" href="#Requirements"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<ul>
+<li>rdkit &gt;= 2020.09.1</li>
+<li>pandas &gt;= 1.1.3</li>
+<li>seaborn</li>
+<li>matplotlib</li>
+<li>fastcore (!conda install fastcore)</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In this tutorial we'll use a dataset compiled by <a href="https://www.nature.com/articles/s41597-019-0151-1">Sorkun et al (2019)</a> from multiple projects to predict water solubility. You can download the original dataset from <a href="https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/OVHAW8">here</a>.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<blockquote>
+<p><code>At the end of the notebook I added a class to process the original dataset in order to remove salts, mixtures, neutralize charges and generate canonical SMILES. I highly recommend checking each structure before modeling.</code></p>
+</blockquote>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Import-modules">
+<a class="anchor" href="#Import-modules" aria-hidden="true"><span class="octicon octicon-link"></span></a>Import modules<a class="anchor-link" href="#Import-modules"> </a>
+</h1>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Code" data-close="Show Code"></summary>
+        <p></p>
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="o">%</span><span class="k">reload_ext</span> autoreload
+<span class="o">%</span><span class="k">autoreload</span> 2
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">from</span> <span class="nn">IPython.display</span> <span class="kn">import</span> <span class="n">Image</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.ticker</span> <span class="kn">import</span> <span class="n">FormatStrFormatter</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">Normalizer</span><span class="p">,</span> <span class="n">normalize</span><span class="p">,</span> <span class="n">RobustScaler</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">joblib</span> <span class="kn">import</span> <span class="n">load</span><span class="p">,</span> <span class="n">dump</span>
+
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span> <span class="nn">scipy.stats</span> <span class="kn">import</span> <span class="n">norm</span>
+<span class="kn">from</span> <span class="nn">statsmodels.graphics.gofplots</span> <span class="kn">import</span> <span class="n">qqplot</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">Draw</span>
+<span class="kn">from</span> <span class="nn">rdkit.Chem</span> <span class="kn">import</span> <span class="n">MolFromSmiles</span><span class="p">,</span> <span class="n">MolToSmiles</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+    </details>
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">rc</span><span class="o">=</span><span class="p">{</span><span class="s1">'figure.figsize'</span><span class="p">:</span> <span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">16</span><span class="p">)})</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s1">'whitegrid'</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_context</span><span class="p">(</span><span class="s1">'paper'</span><span class="p">,</span><span class="n">font_scale</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Load-Data">
+<a class="anchor" href="#Load-Data" aria-hidden="true"><span class="octicon octicon-link"></span></a>Load Data<a class="anchor-link" href="#Load-Data"> </a>
+</h1>
+</div>
+</div>
+</div>
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../_data/curated-solubility-dataset_processed.csv'</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+
+</div>
+    
+
+    
+    
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</pre></div>
+
+    </div>
+</div>
+</div>
+<details class="description">
+      <summary class="btn btn-sm" data-open="Hide Output" data-close="Show Output"></summary>
+        <p>
+</p>
+<div class="output_wrapper">
+<div class="output">
+
+<div class="output_area">
+
+
+<div class="output_html rendered_html output_subarea output_execute_result">
+<div>
+<style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>ID</th>
+      <th>Name</th>
+      <th>InChI</th>
+      <th>InChIKey</th>
+      <th>SMILES</th>
+      <th>Solubility</th>
+      <th>SD</th>
+      <th>Ocurrences</th>
+      <th>Group</th>
+      <th>MolWt</th>
+      <th>...</th>
+      <th>NumValenceElectrons</th>
+      <th>NumAromaticRings</th>
+      <th>NumSaturatedRings</th>
+      <th>NumAliphaticRings</th>
+      <th>RingCount</th>
+      <th>TPSA</th>
+      <th>LabuteASA</th>
+      <th>BalabanJ</th>
+      <th>BertzCT</th>
+      <th>processed_smiles</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>A-3</td>
+      <td>N,N,N-trimethyloctadecan-1-aminium bromide</td>
+      <td>InChI=1S/C21H46N.BrH/c1-5-6-7-8-9-10-11-12-13-...</td>
+      <td>SZEMGTQCPRNXEG-UHFFFAOYSA-M</td>
+      <td>[Br-].CCCCCCCCCCCCCCCCCC[N+](C)(C)C</td>
+      <td>-3.616127</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>G1</td>
+      <td>392.510</td>
+      <td>...</td>
+      <td>142.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.00</td>
+      <td>158.520601</td>
+      <td>0.000000</td>
+      <td>210.377334</td>
+      <td>CCCCCCCCCCCCCCCCCC[N+](C)(C)C</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A-4</td>
+      <td>Benzo[cd]indol-2(1H)-one</td>
+      <td>InChI=1S/C11H7NO/c13-11-8-5-1-3-7-4-2-6-9(12-1...</td>
+      <td>GPYLCFQEKPUWLD-UHFFFAOYSA-N</td>
+      <td>O=C1Nc2cccc3cccc1c23</td>
+      <td>-3.254767</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>G1</td>
+      <td>169.183</td>
+      <td>...</td>
+      <td>62.0</td>
+      <td>2.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>3.0</td>
+      <td>29.10</td>
+      <td>75.183563</td>
+      <td>2.582996</td>
+      <td>511.229248</td>
+      <td>O=C1Nc2cccc3cccc1c23</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>A-5</td>
+      <td>4-chlorobenzaldehyde</td>
+      <td>InChI=1S/C7H5ClO/c8-7-3-1-6(5-9)2-4-7/h1-5H</td>
+      <td>AVPYQKSLYISFPO-UHFFFAOYSA-N</td>
+      <td>Clc1ccc(C=O)cc1</td>
+      <td>-2.177078</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>G1</td>
+      <td>140.569</td>
+      <td>...</td>
+      <td>46.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>17.07</td>
+      <td>58.261134</td>
+      <td>3.009782</td>
+      <td>202.661065</td>
+      <td>O=Cc1ccc(Cl)cc1</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>A-9</td>
+      <td>4-({4-[bis(oxiran-2-ylmethyl)amino]phenyl}meth...</td>
+      <td>InChI=1S/C25H30N2O4/c1-5-20(26(10-22-14-28-22)...</td>
+      <td>FAUAZXVRLVIARB-UHFFFAOYSA-N</td>
+      <td>C1OC1CN(CC2CO2)c3ccc(Cc4ccc(cc4)N(CC5CO5)CC6CO...</td>
+      <td>-4.662065</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>G1</td>
+      <td>422.525</td>
+      <td>...</td>
+      <td>164.0</td>
+      <td>2.0</td>
+      <td>4.0</td>
+      <td>4.0</td>
+      <td>6.0</td>
+      <td>56.60</td>
+      <td>183.183268</td>
+      <td>1.084427</td>
+      <td>769.899934</td>
+      <td>c1cc(N(CC2CO2)CC2CO2)ccc1Cc1ccc(N(CC2CO2)CC2CO...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>A-10</td>
+      <td>vinyltoluene</td>
+      <td>InChI=1S/C9H10/c1-3-9-6-4-5-8(2)7-9/h3-7H,1H2,2H3</td>
+      <td>JZHGRUMIRATHIU-UHFFFAOYSA-N</td>
+      <td>Cc1cccc(C=C)c1</td>
+      <td>-3.123150</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>G1</td>
+      <td>118.179</td>
+      <td>...</td>
+      <td>46.0</td>
+      <td>1.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>1.0</td>
+      <td>0.00</td>
+      <td>55.836626</td>
+      <td>3.070761</td>
+      <td>211.033225</td>
+      <td>C=Cc1cccc(C)c1</td>
+    </tr>
+  </tbody>
+</table>
+<p>5 rows × 27 columns</p>
+</div>
+</div>
+
+</div>
+
+</div>
+</div>
+
+    </details>
+</div>
+    
+
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="References">
+<a class="anchor" href="#References" aria-hidden="true"><span class="octicon octicon-link"></span></a>References<a class="anchor-link" href="#References"> </a>
+</h1>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>Detecting outliers</strong></p>
+<p><a href="https://www.ucd.ie/ecomodel/Resources/QQplots_WebVersion.html">https://www.ucd.ie/ecomodel/Resources/QQplots_WebVersion.html</a></p>
+<p><a href="https://www.dummies.com/programming/big-data/data-science/graphical-tests-of-data-outliers/">https://www.dummies.com/programming/big-data/data-science/graphical-tests-of-data-outliers/</a></p>
+<p><a href="https://machinelearningmastery.com/how-to-use-statistics-to-identify-outliers-in-data/">https://machinelearningmastery.com/how-to-use-statistics-to-identify-outliers-in-data/</a></p>
+<p><a href="https://towardsdatascience.com/ways-to-detect-and-remove-the-outliers-404d16608dba">https://towardsdatascience.com/ways-to-detect-and-remove-the-outliers-404d16608dba</a></p>
+<p><a href="https://www.dbs.ifi.lmu.de/Publikationen/Papers/LOF.pdf">https://www.dbs.ifi.lmu.de/Publikationen/Papers/LOF.pdf</a></p>
+<p><a href="https://towardsdatascience.com/local-outlier-factor-for-anomaly-detection-cc0c770d2ebe">https://towardsdatascience.com/local-outlier-factor-for-anomaly-detection-cc0c770d2ebe</a></p>
+<p><strong>Normality tests</strong></p>
+<p>Machine learning mastery post: <a href="https://machinelearningmastery.com/a-gentle-introduction-to-normality-tests-in-python/">https://machinelearningmastery.com/a-gentle-introduction-to-normality-tests-in-python/</a></p>
+<p>Shapiro-Wilk test: <a href="https://www.itl.nist.gov/div898/handbook/prc/section2/prc213.htm">https://www.itl.nist.gov/div898/handbook/prc/section2/prc213.htm</a></p>
+<p>Anderson-Darling test : <a href="https://www.itl.nist.gov/div898/handbook/prc/section2/prc21.htm">https://www.itl.nist.gov/div898/handbook/prc/section2/prc21.htm</a></p>
+<p>GraphPad entry: <a href="https://www.graphpad.com/guides/prism/latest/statistics/stat_choosing_a_normality_test.htm">https://www.graphpad.com/guides/prism/latest/statistics/stat_choosing_a_normality_test.htm</a></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="Fin">
+<a class="anchor" href="#Fin" aria-hidden="true"><span class="octicon octicon-link"></span></a><strong>Fin</strong><a class="anchor-link" href="#Fin"> </a>
+</h1>
+</div>
+</div>
+</div>
+</div>
+
+
+
+  </div><!-- from https://github.com/utterance/utterances -->
+<script src="https://utteranc.es/client.js"
+        repo="marcossantanaioc/fiocruzcheminformatics"
+        issue-term="title"
+        label="blogpost-comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script><a class="u-url" href="/fiocruzcheminformatics/jupyter/2022/04/27/clustering_dev.html" hidden></a>
+</article>
+      </div>
+    </main><footer class="site-footer h-card">
+  <data class="u-url" href="/fiocruzcheminformatics/"></data>
+
+  <div class="wrapper">
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col">
+        <p class="feed-subscribe">
+          <a href="/fiocruzcheminformatics/feed.xml">
+            <svg class="svg-icon orange">
+              <use xlink:href="/fiocruzcheminformatics/assets/minima-social-icons.svg#rss"></use>
+            </svg><span>Subscribe</span>
+          </a>
+        </p>
+      </div>
+      <div class="footer-col">
+        <p>This blog will cover basic and SOTA cheminformatics topics.</p>
+      </div>
+    </div>
+
+    <div class="social-links"><ul class="social-media-list"><li><a rel="me" href="https://github.com/marcossantanaioc" target="_blank" title="marcossantanaioc"><svg class="svg-icon grey"><use xlink:href="/fiocruzcheminformatics/assets/minima-social-icons.svg#github"></use></svg></a></li></ul>
+</div>
+
+  </div>
+
+</footer>
+</body>
+
+</html>
